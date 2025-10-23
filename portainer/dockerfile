@@ -1,0 +1,9 @@
+FROM docker:27.0.3-cli-alpine3.20
+RUN apk add --no-cache docker-cli-compose bash
+WORKDIR /app
+COPY . /app
+ARG LAN_IP
+ENV LAN_IP=$LAN_IP
+
+# Default behavior: run the compose file, but allow overrides
+CMD ["docker", "compose", "up", "-d"]
