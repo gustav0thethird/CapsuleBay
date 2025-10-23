@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "3214:3214"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_HOST=${LAN_IP}
+      - N8N_PORT=3214
+      - N8N_SECURE_COOKIE=false
+      - WEBHOOK_URL=http://${LAN_IP}:3214/
+    volumes:
+      - ./data:/home/node/.n8n
