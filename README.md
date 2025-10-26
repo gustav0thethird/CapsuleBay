@@ -1,6 +1,6 @@
 # CapsuleBay  
-[![CapsuleBay CI](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/CI.yml/badge.svg)](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/CI.yml)
-[![Snyk Security Scan](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/snyk.yml/badge.svg)](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/snyk.yml)
+[![CapsuleBay CI](https://github.com/gustav0thethird/CapsuleBay/actions/workflows/CI.yml/badge.svg)](https://github.com/gustav0thethird/CapsulBay/actions/workflows/CI.yml)
+[![Snyk Security Scan](https://github.com/gustav0thethird/CapsuleBay/actions/workflows/snyk.yml/badge.svg)](https://github.com/gustav0thethird/CapsuleBay/actions/workflows/snyk.yml)
 ### Self-contained hybrid CI/CD system for modular, image-based capsule deployments with Vault-based secret management and integrated security scanning  
 
 > “Where each service carries its own deployment logic.”  
@@ -77,7 +77,7 @@ flowchart TD
         J1[Confirm Selection]
         J2[Build & Push Capsule Images]
         J3[Trivy Security Scan]
-        J4[Ensure VM is Running (Proxmox API)]
+        J4["Ensure VM is Running (Proxmox API)"]
         J5[Fetch Secrets from Vault]
         J6[Pull & Deploy via SSH]
         J7[Send Discord Notification]
@@ -96,7 +96,7 @@ flowchart TD
 
     subgraph H[Docker Host VM]
         H1[Pull Capsule Image]
-        H2[Inject Secrets (.env)]
+        H2["Inject Secrets (.env)"]
         H3[Extract docker-compose.yml]
         H4[Deploy via docker compose up -d]
     end

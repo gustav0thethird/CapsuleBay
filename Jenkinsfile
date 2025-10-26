@@ -209,7 +209,7 @@ pipeline {
                     def payload = [
                         content: "${userPing}",
                         embeds: [[
-                            title: "✅ Deployment Successful",
+                            title: "✅ CapsuleBay Deployment Successful",
                             color: 3066993,
                             fields: [
                                 [name: "Service", value: "${params.SERVICE}", inline: true],
@@ -240,7 +240,7 @@ pipeline {
                     def payload = [
                         content: "${userPing}",
                         embeds: [[
-                            title: "❌ Deployment Failed",
+                            title: "❌ CapsuleBay Deployment Failed",
                             color: 15158332,
                             fields: [
                                 [name: "Service", value: "${params.SERVICE}", inline: true],
