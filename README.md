@@ -1,14 +1,17 @@
 # CapsuleBay
-### Self-contained CI/CD system for modular, image-based capsule deployments with Vault-based secret management
+### Self-contained CI/CD system for modular, image-based capsule deployments with Vault-based secret management  
+
+> *“Where each service carries its own deployment logic.”*  
+> Build once. Push anywhere. Deploy with confidence.
 
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/069174e0-760d-4c75-ba71-b0e31679f723" />
 
 ---
 
-CapsuleBay is a Jenkins pipeline that automates the full **build → push → deploy** process for your self-hosted services.
+CapsuleBay is a **Jenkins-driven pipeline** that automates the full **build → push → deploy** process for your self-hosted services.
 
-Each service lives in its own folder with a lightweight **Dockerfile** and **docker-compose.yml**.  
-When built, the image becomes a **deployment capsule** that carries its own compose and logic inside it.  
+Each service lives in its own folder as a lightweight **deployment capsule** — a self-contained unit with its own Dockerfile and docker-compose.yml.  
+When built, the image becomes an **immutable capsule** that carries its own deployment logic and configuration inside it.  
 The pipeline builds those capsules, pushes them to a **local registry**, ensures the target **hypervisor VM** is running, securely retrieves environment secrets from **Vault**, and deploys each stack remotely via SSH.
 
 ---
@@ -142,7 +145,25 @@ flowchart TD
     └── docker-compose.yml
 ```
 
-Each directory bar Infra represents a self-contained deployment capsule
+Each directory bar Infra represents a self-contained deployment capsule.
+
+---
+
+## 🧩 Adding New Services
+
+CapsuleBay is designed to scale linearly — adding a new service requires **no pipeline rewrites**.
+
+To add a new deployment capsule:
+1. Create a new folder (e.g. `myservice/`).
+2. Add a minimal `Dockerfile` and `docker-compose.yml`.
+3. Update the Jenkins pipeline **SERVICE** parameter options.
+
+That’s it — Jenkins will automatically:
+- Build and push the new capsule to your local registry.
+- Retrieve environment secrets dynamically from Vault.
+- Deploy it remotely using the same flow as existing services.
+
+> ⚡ No extra scripts. No manual integration. Just plug, build, and deploy.
 
 ---
 
