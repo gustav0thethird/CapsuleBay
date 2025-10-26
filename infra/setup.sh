@@ -7,7 +7,7 @@ set -Eeuo pipefail
 # ==========================================
 
 # Defaults
-BASE_DIR="${BASE_DIR:-/opt/infra"
+BASE_DIR="${BASE_DIR:-/opt/infra}"
 LAN_IP="${LAN_IP:-$(hostname -I | awk '{print $1}')}"
 REGISTRY_TITLE="${REGISTRY_TITLE:-Local Registry}"
 JENKINS_USER="${JENKINS_USER:-jenkins}"
