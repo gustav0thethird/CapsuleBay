@@ -10,14 +10,15 @@ pipeline {
     }
 
     environment {
-        INFRA_HOST     = '10.0.0.10'              // <-- Replace with your Proxmox or hypervisor host/IP
-        INFRA_CREDS    = 'infra-api-creds'        // <-- Jenkins credentials ID for Proxmox API token or login
-        INFRA_NODE     = 'infra-node'             // <-- Replace with the name of your Proxmox node (e.g. pve01)
-        REGISTRY       = 'registry.local:5000'    // <-- Replace with your local/private Docker registry address
-        DOCKER_CREDS   = 'registry-creds'         // <-- Jenkins credentials ID for Docker registry auth
-        DOCKER_USER    = 'deploy-user'            // <-- SSH username Jenkins uses to connect to the Docker VM
-        VMID           = '100'                    // <-- ID of the VM that hosts your Docker environment in Proxmox
-        REMOTE_PATH    = '/opt/containers'        // <-- Path on the Docker VM where stacks should be deployed
+        INFRA_HOST     = 'infra.example.local'       // <-- Replace with your Proxmox or hypervisor host/IP
+        INFRA_CREDS    = 'infra-api-creds'           // <-- Jenkins credentials ID for Proxmox API token or login
+        INFRA_NODE     = 'infra-node'                // <-- Replace with the name of your Proxmox node (e.g. pve01)
+        REGISTRY       = 'registry.example.local:5000' // <-- Replace with your local/private Docker registry address
+        DOCKER_CREDS   = 'registry-creds'            // <-- Jenkins credentials ID for Docker registry auth
+        DOCKER_USER    = 'deploy-user'               // <-- SSH username Jenkins uses to connect to the Docker VM
+        VMID           = '100'                       // <-- ID of the VM that hosts your Docker environment in Proxmox
+        REMOTE_PATH    = '/opt/containers'           // <-- Path on the Docker VM where stacks should be deployed
+        VAULT          = 'vault.example.local:8200'  // <-- Vault instance for secrets (optional)
     }
 
     stages {
@@ -69,7 +70,6 @@ pipeline {
             }
         }
 
-        // Please note this stage is not currently working and will be updated!
         // Checks Proxmox via API to make sure the target Docker VM is running
         stage('Ensure VM is Running') {
             steps {
@@ -97,26 +97,48 @@ pipeline {
             steps {
                 script {
                     def envMap = [
-                        dev:      [host: '10.0.0.11', creds: 'ssh-dev'],       // <-- Replace with SSH host + Jenkins credential IDs
-                        staging:  [host: '10.0.0.12', creds: 'ssh-staging'],   // <-- Replace with SSH host + Jenkins credential IDs
-                        prod:     [host: '10.0.0.13', creds: 'ssh-prod']       // <-- Replace with SSH host + Jenkins credential IDs
+                        dev:      [host: 'dev-host.example.local', creds: 'ssh-dev'],       // <-- Replace with SSH host + Jenkins credential IDs
+                        staging:  [host: 'staging-host.example.local', creds: 'ssh-staging'], // <-- Replace with SSH host + Jenkins credential IDs
+                        prod:     [host: 'prod-host.example.local', creds: 'ssh-prod']       // <-- Replace with SSH host + Jenkins credential IDs
                     ]
 
                     def selectedEnv = envMap[params.ENVIRONMENT]
                     def targetHost  = selectedEnv.host
                     def targetCreds = selectedEnv.creds
 
+                    def lanMap = [
+                        dev:      [lan_ip: '10.0.0.11'],
+                        staging:  [lan_ip: '10.0.0.12'],
+                        prod:     [lan_ip: '10.0.0.13']
+                    ]
+                    def selectedLan = lanMap[params.ENVIRONMENT]
+                    def LAN_IP = selectedLan.lan_ip
+
                     def targets = (params.SERVICE == 'all') ? ['n8n', 'portainer', 'whoami'] : [params.SERVICE]
 
-                    sshagent (credentials: [targetCreds]) {
-                        withCredentials([usernamePassword(
-                            credentialsId: env.DOCKER_CREDS,
-                            usernameVariable: 'REG_USER',
-                            passwordVariable: 'REG_PASS'
-                        )]) {
+                    withCredentials([
+                        string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN'),
+                        usernamePassword(credentialsId: env.DOCKER_CREDS, usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')
+                    ]) {
+
+                        sshagent (credentials: [targetCreds]) {
 
                             targets.each { svc ->
                                 echo "Deploying ${svc} stack on remote host..."
+                                sh """
+                                echo "Fetching secrets from Vault..."
+                                curl -s -H "X-Vault-Token: ${VAULT_TOKEN}" \
+                                    http://${env.VAULT}/v1/secret/data/${svc}/${params.ENVIRONMENT} \
+                                    | docker run --rm -i imega/jq -r '.data.data | to_entries | .[] | "\\(.key)=\\(.value)"' > .env
+
+                                echo "Injecting LAN_IP..."
+                                echo "LAN_IP=${LAN_IP}" >> .env
+
+                                echo "Copying .env to remote host..."
+                                scp -o StrictHostKeyChecking=no .env ${DOCKER_USER}@${targetHost}:${REMOTE_PATH}/${svc}/.env
+                                rm -f .env
+                                """
+
                                 sh """
                                 ssh -o StrictHostKeyChecking=no ${DOCKER_USER}@${targetHost} "
                                     set -e
@@ -137,8 +159,9 @@ pipeline {
                                     cd ${REMOTE_PATH}/${svc}
 
                                     echo 'Stopping and removing existing containers...'
-                                    docker compose down || true
-                                    docker ps -aq --filter 'name=^/${svc}' | xargs -r docker rm -f || true
+                                    docker compose down --remove-orphans || true
+                                    docker ps -aq --filter \\"label=com.docker.compose.project=${svc}\\" | xargs -r docker rm -f || true
+                                    docker container prune -f || true
 
                                     echo 'Starting stack...'
                                     docker compose up -d
