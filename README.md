@@ -213,7 +213,7 @@ Secrets are injected automatically into each `.env` file during deployment.
 **n8n/Dockerfile**
 ```dockerfile
 FROM docker:27.0.3-cli-alpine3.20
-RUN apk add --no-cache docker-cli-compose bash curl jq
+RUN apk add --no-cache docker-cli-compose bash
 WORKDIR /app
 COPY . /app
 ARG LAN_IP
