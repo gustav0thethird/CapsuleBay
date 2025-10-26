@@ -1,4 +1,6 @@
 # CapsuleBay  
+[![CapsuleBay CI](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/CI.yml/badge.svg)](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/CI.yml)
+[![Snyk Security Scan](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/snyk.yml/badge.svg)](https://github.com/gustav0thethird/CapsuleDeploy/actions/workflows/snyk.yml)
 ### Self-contained hybrid CI/CD system for modular, image-based capsule deployments with Vault-based secret management and integrated security scanning  
 
 > “Where each service carries its own deployment logic.”  
