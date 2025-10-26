@@ -1,0 +1,74 @@
+version: "3.9"
+
+name: infra
+
+services:
+  vault:
+    image: hashicorp/vault:1.15.4
+    container_name: vault
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - LAN_IP=${LAN_IP}
+    volumes:
+      - ./data/vault:/vault/file
+      - ./vault.hcl:/vault/config/vault.hcl:ro
+    command: ["vault", "server", "-config=/vault/config/vault.hcl"]
+    restart: unless-stopped
+    networks: [infra]
+  htpasswd:
+    image: httpd:alpine
+    container_name: htpasswd-generator
+    entrypoint: >
+      sh -c "mkdir -p /auth && \
+             htpasswd -Bbn jenkins jenkinspass > /auth/htpasswd"
+    volumes:
+      - ./data/auth:/auth
+    restart: "no"
+    networks: [infra]
+
+  registry:
+    image: registry:2.8.3
+    depends_on:
+      htpasswd:
+        condition: service_completed_successfully
+    container_name: docker-registry
+    ports:
+      - "${LAN_IP}:5000:5000"
+    environment:
+      REGISTRY_HTTP_ADDR: :5000
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    volumes:
+      - ./data/registry:/var/lib/registry
+      - ./data/auth:/auth:ro
+      - ./data/registry/config.yml:/etc/docker/registry/config.yml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/v2/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [infra]
+
+  registry-ui:
+    image: joxit/docker-registry-ui:2.5.0
+    container_name: docker-registry-ui
+    ports:
+      - "${LAN_IP}:5001:80"
+    environment:
+      - REGISTRY_TITLE=${REGISTRY_TITLE}
+      - REGISTRY_URL=http://${LAN_IP}:5000
+      - DELETE_IMAGES=true
+    depends_on:
+      - registry
+    restart: unless-stopped
+    networks: [infra]
+
+networks:
+  infra:
+    driver: bridge
