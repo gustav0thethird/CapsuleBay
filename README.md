@@ -3,8 +3,9 @@
 
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/069174e0-760d-4c75-ba71-b0e31679f723" />
 
-This Jenkins pipeline automates the full **build → push → deploy** process for your self-hosted services.  
-It’s designed for **modular, image-based deployment capsules** — each one self-contained and securely configured through **HashiCorp Vault**.
+---
+
+CapsuleBay is a Jenkins pipeline that automates the full **build → push → deploy** process for your self-hosted services.
 
 Each service lives in its own folder with a lightweight **Dockerfile** and **docker-compose.yml**.  
 When built, the image becomes a **deployment capsule** that carries its own compose and logic inside it.  
