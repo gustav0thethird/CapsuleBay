@@ -1,0 +1,35 @@
+name: Snyk Dockerfile Scan
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  snyk-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker and Snyk
+        run: |
+          sudo apt-get update
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Build and scan all Dockerfiles
+        run: |
+          echo "Searching for Dockerfiles..."
+          find . -type f -iname "dockerfile" | while read file; do
+            dir=$(dirname "$file")
+            clean_dir=$(echo "$dir" | sed 's|[./]|-|g')  # remove ./ and / to make tag safe
+            image_name="snyk-scan-${clean_dir}"
+            
+            echo "Building and scanning $file as $image_name:latest ..."
+            docker build -t "$image_name:latest" "$dir"
+            snyk container test "$image_name:latest" --file="$file" --severity-threshold=high || true
+            echo "--------------------------------------------------------"
+          done
