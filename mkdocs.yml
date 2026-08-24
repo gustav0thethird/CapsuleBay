@@ -1,8 +1,9 @@
 site_name: CapsuleBay
-site_description: Source of truth. Mirrored out to github.com/gustav0thethird/CapsuleBay.
+site_description: Shell tooling - early / scratch
 
 plugins:
   - techdocs-core
 
 nav:
   - Home: index.md
+  - Readme: readme.md

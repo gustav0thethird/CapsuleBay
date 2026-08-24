@@ -2,15 +2,20 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: CapsuleBay
-  description: Source of truth. Mirrored out to github.com/gustav0thethird/CapsuleBay.
+  description: Shell tooling - early / scratch
   annotations:
-    # Tells TechDocs the docs live in this repo, built from mkdocs.yml.
     backstage.io/techdocs-ref: dir:.
     gitlab.com/project-slug: yditj/projects/archive/CapsuleBay
+  links:
+    - url: https://github.com/gustav0thethird/CapsuleBay
+      title: GitHub
+      icon: github
   tags:
+    - shell
+    - scratch
     - archive
 spec:
-  type: service
+  type: tool
   lifecycle: experimental
   owner: gtully
   system: archive
