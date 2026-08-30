@@ -9,34 +9,34 @@
   },
   ".gitlab-ci.yml": {
     "sha": "a40e37e20408",
-    "summary": "This file configures a GitLab CI pipeline that includes templates for AI documentation and a GitHub mirror."
+    "summary": "This file includes CI templates for AI documentation and GitHub mirroring in a standardized GitLab CI configuration."
   },
   "catalog-info.yaml": {
-    "sha": "36f927639142",
-    "summary": "This file contains metadata for the CapsuleBay component, describing its purpose and providing links and annotations for Backstage integration."
+    "sha": "92bd51c91e35",
+    "summary": "This file contains metadata for the CapsuleBay component, describing its features and capabilities within the Backstage ecosystem."
   },
   "infra/docker-compose.yml": {
     "sha": "1c5de377c2f4",
-    "summary": "This file defines a Docker Compose configuration for setting up services like Vault, a Docker registry, and a UI for managing the registry."
+    "summary": "This file defines a Docker Compose configuration for setting up infrastructure services including Vault, a Docker registry, and a UI for the registry."
   },
   "infra/setup.sh": {
     "sha": "022b1761afa0",
-    "summary": "This script automates the setup of the CapsuleBay infrastructure, including creating necessary directories, configuring Vault, and launching Docker services."
+    "summary": "This script automates the setup of the CapsuleBay infrastructure, including creating necessary directories, configuring Vault, and starting services with Docker Compose."
   },
   "mkdocs.yml": {
-    "sha": "89c4f0c660eb",
+    "sha": "00112d5b1eab",
     "summary": "Configures the documentation site for CapsuleBay, detailing its structure and navigation."
   },
   "n8n/docker-compose.yml": {
     "sha": "7aad65ae2cb8",
-    "summary": "Defines the Docker setup for the n8n workflow automation tool, including environment variables and port mappings."
+    "summary": "Defines the Docker configuration for running the n8n workflow automation tool with specified environment variables and port mappings."
   },
   "portainer/docker-compose.yml": {
     "sha": "a9819bb46a77",
-    "summary": "Sets up the Portainer container management interface with specified ports and volume mappings."
+    "summary": "Sets up the Docker configuration for Portainer, a management UI for Docker, with necessary environment variables and volume mappings."
   },
   "whoami/docker-compose.yml": {
     "sha": "e4235687ae2c",
-    "summary": "Configures the whoami service, a simple HTTP server for testing, with port and environment settings."
+    "summary": "Specifies the Docker configuration for the whoami service, which provides a simple HTTP server for testing and debugging."
   }
 }

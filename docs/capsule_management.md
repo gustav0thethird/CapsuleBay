@@ -2,111 +2,101 @@
 
 ## Overview
 
-CapsuleBay allows you to add new capsules easily, following a structured approach. Each capsule is a self-contained deployment unit, encapsulating its own Dockerfile and docker-compose.yml. This document outlines the guidelines for adding new capsules, including the necessary folder structure and files.
+CapsuleBay utilizes a modular architecture where each service is encapsulated in its own directory, functioning as a self-contained deployment unit. Each capsule includes its own `Dockerfile` and `docker-compose.yml`, ensuring no dependencies on external scripts or the repository's Git state.
 
-## Folder Structure
+## Adding a New Capsule
 
-When adding a new capsule, create a new directory within the root of the repository. The structure should resemble the following:
+To add a new service (capsule) to CapsuleBay, follow these steps:
 
-```
-.
-└── myservice/
-    ├── Dockerfile
-    └── docker-compose.yml
-```
+1. **Create a Folder**: Create a new directory for your service, e.g., `myservice/`.
+2. **Add Required Files**:
+   - **Dockerfile**: This file defines how to build the Docker image for your service.
+   - **docker-compose.yml**: This file specifies the services, networks, and volumes required for your application.
 
-### Directory Naming
+3. **Update Jenkins Configuration**: Add the name of your new folder to the `SERVICE` parameter list in the Jenkins configuration. This allows Jenkins to recognize and manage the new capsule.
 
-- The directory name should be descriptive of the service it contains (e.g., `myservice`).
-
-## Necessary Files
-
-### 1. Dockerfile
-
-The `Dockerfile` defines how to build the capsule image. It should include all necessary instructions to set up the environment for the service. Here is a basic example:
-
-```dockerfile
-FROM <base-image>
-# Install dependencies
-RUN <install-commands>
-# Set working directory
-WORKDIR /app
-# Copy application files
-COPY . /app
-# Define command to run the service
-CMD ["<command-to-start-service>"]
-```
-
-### 2. docker-compose.yml
-
-The `docker-compose.yml` file specifies how to run the service, including its dependencies and configurations. A sample structure is as follows:
-
-```yaml
-version: "3.9"
-services:
-  myservice:
-    image: <image-name>:<tag>
-    ports:
-      - "<host-port>:<container-port>"
-    env_file:
-      - .env
-```
-
-### 3. Environment Variables
-
-If your service requires environment variables, create a `.env` file in the capsule directory. This file will be automatically injected during deployment. An example `.env` file might look like this:
-
-```
-MY_ENV_VAR=value
-ANOTHER_ENV_VAR=another_value
-```
-
-## Updating the Pipeline
-
-After creating the new capsule, you need to update the Jenkins pipeline to include the new service. This is done by adding the folder name to the `SERVICE` parameter list in the Jenkinsfile.
-
-## Automated Processes
-
-Once the new capsule is added and the pipeline is updated, CapsuleBay will automatically handle the following:
-
+Once these steps are completed, CapsuleBay will automatically handle the following processes:
 - Build and push the capsule image.
 - Scan the image for vulnerabilities.
 - Retrieve secrets from Vault.
 - Deploy the capsule remotely on the appropriate VM.
 
-No additional scripts or manual pipeline edits are required.
+No additional pipeline edits or scripts are necessary.
 
-## Example Capsule
+## Folder Structure
 
-To illustrate, here’s a complete example of a new capsule named `myservice`.
+The folder structure for each capsule should resemble the following:
 
-**myservice/Dockerfile**
-```dockerfile
-FROM node:14
-WORKDIR /app
-COPY . .
-RUN npm install
-CMD ["npm", "start"]
+```
+myservice/
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-**myservice/docker-compose.yml**
+## Dockerfile Requirements
+
+Your `Dockerfile` should include the necessary instructions to build the image for your service. Here is a basic example:
+
+```dockerfile
+FROM <base-image>
+# Install dependencies
+RUN <install-commands>
+WORKDIR /app
+COPY . /app
+CMD ["<command-to-start-service>"]
+```
+
+### Example Dockerfile
+
+```dockerfile
+FROM docker:27.0.3-cli-alpine3.20
+RUN apk add --no-cache docker-cli-compose bash
+WORKDIR /app
+COPY . /app
+ARG LAN_IP
+ENV LAN_IP=$LAN_IP
+CMD ["docker", "compose", "up", "-d"]
+```
+
+## docker-compose.yml Requirements
+
+The `docker-compose.yml` file should define the services, networks, and volumes required for your application. Ensure that it includes the necessary environment variables and ports.
+
+### Example docker-compose.yml
+
 ```yaml
 version: "3.9"
 services:
   myservice:
     image: myservice:latest
     ports:
-      - "3000:3000"
+      - "8080:8080"
     env_file:
       - .env
 ```
 
-**myservice/.env**
+## Pipeline Parameters
+
+When adding a new capsule, ensure the following parameters are set in Jenkins:
+
+| Parameter   | Options                          | Description                                       |
+|-------------|----------------------------------|---------------------------------------------------|
+| SERVICE     | `myservice`, `all`              | Which stack(s) to deploy                          |
+| ENVIRONMENT | `dev`, `staging`, `prod`        | Target environment and Vault path                 |
+| RUN_TYPE    | `Deploy`, `Build and Deploy`    | Choose whether to rebuild or redeploy only        |
+
+## Vault Configuration
+
+For each new service, you may need to configure secrets in Vault. Use the following commands to enable and store secrets:
+
+```bash
+vault secrets enable -path=secret kv-v2
+vault kv put secret/myservice/dev MY_SECRET_KEY=mysecretvalue
+vault kv get secret/myservice/dev
 ```
-NODE_ENV=production
-API_KEY=your_api_key
-```
+
+Secrets will be automatically injected into the `.env` file during deployment.
 
 ## Conclusion
 
-By following these guidelines, you can efficiently add new capsules to CapsuleBay. Ensure that the folder structure is maintained, and the necessary files are included for a smooth integration into the CI/CD pipeline.
+By following these guidelines, you can efficiently add new capsules to the CapsuleBay framework. Ensure that each capsule is self-contained with its own `Dockerfile` and `docker-compose.yml`, and update the Jenkins configuration accordingly. This modular approach facilitates streamlined builds, scans, and deployments.

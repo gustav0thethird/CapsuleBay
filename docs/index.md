@@ -1,62 +1,57 @@
-# Overview
+# CapsuleBay Overview
 
-CapsuleBay is a hybrid CI/CD framework designed for modular, image-based deployments using self-contained deployment capsules. Each capsule is a Docker image that includes its own `docker-compose.yml` and configuration logic, allowing for independent builds and deployments without reliance on external scripts or Git state.
+CapsuleBay is a hybrid CI/CD framework designed for modular, image-based capsule deployments, incorporating integrated security scanning and secret management. It automates the entire **build → push → scan → deploy** pipeline across both GitHub Actions and Jenkins, ensuring a streamlined and secure deployment process.
 
-The CapsuleBay system automates the entire **build → push → scan → deploy** pipeline, integrating key features such as:
+## Key Features
 
-- **Vault-based secret management**: Securely manage and inject secrets during deployment.
-- **Per-service modular builds**: Each service is encapsulated in its own Docker image.
-- **Immutable image capsules**: Ensures consistency and reliability in deployments.
-- **Automated VM lifecycle management**: Utilizes the Proxmox API to manage virtual machines.
-- **Integrated security scanning**: Employs tools like Trivy and Snyk to scan for vulnerabilities.
-- **Discord notifications**: Provides real-time updates on build status, including links and timestamps.
+- **Self-contained Deployment Capsules**: Each service is encapsulated in a Docker image that includes its own `docker-compose.yml` and configuration logic, eliminating dependencies on external scripts or Git state.
+  
+- **Vault-based Secret Management**: Secrets are securely managed and injected into the deployment process using HashiCorp Vault.
+
+- **Per-service Modular Builds**: Each service can be built independently, allowing for flexibility and scalability.
+
+- **Immutable Image Capsules**: Each capsule is versioned and tagged, ensuring consistency across deployments.
+
+- **Automated VM Lifecycle Management**: Integration with the Proxmox API allows for automated management of virtual machines.
+
+- **Integrated Security Scanning**: Utilizes tools like Trivy and Snyk to scan for vulnerabilities in images and Dockerfiles.
+
+- **Discord Notifications**: Automated notifications provide updates on build status, including links, timestamps, and durations.
 
 ## System Architecture
 
-CapsuleBay operates through two primary CI/CD layers:
+CapsuleBay operates on two distinct CI/CD layers:
 
 ### 1. GitHub Actions – Cloud Validation Layer
-This layer automatically triggers on every push or pull request, performing the following tasks:
+- Automatically triggers on every push or pull request.
 - Builds capsule images for validation.
-- Executes Trivy image scans for vulnerabilities.
-- Runs Snyk Dockerfile scans for dependency issues.
+- Executes Trivy scans for vulnerabilities.
+- Runs Snyk scans for dependency-level issues.
 - Uploads scan reports as artifacts for review.
 
 ### 2. Jenkins – Self-Hosted Deployment Layer
-This layer manages controlled deployments within your local network, executing the following:
+- Manages controlled, Vault-secured deployments within your local network.
 - Builds, tags, and pushes capsule images to a local registry.
 - Retrieves secrets dynamically from Vault.
-- Ensures the target VM is powered on using the Proxmox API.
-- Rescans built images with Trivy before deployment.
-- Deploys capsules remotely using the embedded `docker-compose.yml`.
-- Sends notifications via Discord with relevant build information.
+- Ensures the target VM is powered on via the Proxmox API.
+- Rescans built images using Trivy before deployment.
+- Deploys capsules remotely with embedded `docker-compose.yml`.
+- Sends Discord notifications with relevant build information.
 
 ## Getting Started
 
-To deploy the core infrastructure for CapsuleBay, run the following command:
-
+### Deploy the Core Infrastructure
+To set up the necessary infrastructure, run the following command:
 ```bash
 cd infra
 sudo ./setup.sh
 ```
-
 This script will:
-- Automatically detect your LAN IP.
-- Create necessary `.env` and `.secrets` files with generated credentials.
+- Detect your LAN IP automatically.
+- Create a `.env` and `.secrets` file with generated credentials.
 - Deploy Vault, a local image registry, and an optional registry UI.
 
-After setup, the following services will be available:
-
-| Service | Purpose | URL |
-|----------|----------|-----|
-| Vault | Secret storage for Jenkins & services | `http://<LAN_IP>:8200` |
-| Registry | Local image registry | `http://<LAN_IP>:5000` |
-| Registry UI | Optional web dashboard | `http://<LAN_IP>:5001` |
-
-## Repository Structure
-
-The CapsuleBay repository is organized as follows:
-
+### Repository Structure
 ```
 .
 ├── Jenkinsfile                  # Main CapsuleBay pipeline
@@ -76,44 +71,32 @@ The CapsuleBay repository is organized as follows:
     ├── Dockerfile
     └── docker-compose.yml
 ```
-
-Each service directory (except `infra/`) contains a self-contained capsule.
+Each service directory contains its own Dockerfile and `docker-compose.yml`, making them self-contained capsules.
 
 ## Adding a New Capsule
+To add a new service:
+1. Create a folder for the service, e.g., `myservice/`.
+2. Add a `Dockerfile` and `docker-compose.yml`.
+3. Update the Jenkins `SERVICE` parameter list.
 
-To add a new service, follow these steps:
-
-1. Create a new folder, e.g., `myservice/`.
-2. Add a `Dockerfile` and `docker-compose.yml` in the folder.
-3. Include the folder name in the Jenkins `SERVICE` parameter list.
-
-CapsuleBay will automatically handle the build, push, scan, and deployment processes without requiring additional pipeline edits or scripts.
+CapsuleBay will automatically handle the build, scan, and deployment processes without requiring additional pipeline edits.
 
 ## Security Stack
-
-CapsuleBay incorporates multiple layers of security checks:
-
-| Layer | Tool | Purpose |
-|--------|------|----------|
-| GitHub Actions (pre-merge) | Trivy | Scan built images for vulnerabilities |
-| | Snyk | Scan Dockerfiles for dependency CVEs |
-| Jenkins (pre-deploy) | Trivy CLI | Rescan final image before deployment |
-| Vault | HashiCorp Vault | Securely manage and deliver secrets |
-| Discord | Webhook alerts | Notify on success or failure with build links |
+CapsuleBay integrates multiple layers of security checks:
+- **Pre-merge**: Trivy scans built images for vulnerabilities.
+- **Dependency Scanning**: Snyk scans Dockerfiles for CVEs.
+- **Pre-deploy**: Jenkins rescans the final image before deployment.
+- **Secret Management**: HashiCorp Vault securely manages and delivers secrets.
 
 ## Discord Notifications
-
-At the end of each pipeline run, CapsuleBay sends a Discord notification containing:
-
-- Service name  
-- Environment  
-- Build link  
-- Duration  
-- Timestamp  
-- User ping  
+At the end of each pipeline run, CapsuleBay sends a Discord notification with:
+- Service name
+- Environment
+- Build link
+- Duration
+- Timestamp
 
 This ensures that the team is informed of the deployment status in real-time.
 
 ## Conclusion
-
-CapsuleBay provides a robust framework for managing modular, image-based deployments with integrated security scanning and secret management. Its architecture supports both cloud validation and self-hosted deployments, ensuring a secure and efficient CI/CD process.
+CapsuleBay provides a robust framework for managing CI/CD processes with a focus on security, modularity, and ease of use. By encapsulating services into self-contained deployment units, it simplifies the deployment process while maintaining high standards of security and efficiency.

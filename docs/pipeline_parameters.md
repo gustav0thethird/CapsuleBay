@@ -1,18 +1,40 @@
 # Pipeline Parameters
 
-## Overview of Parameters
+This document explains the parameters used in the CapsuleBay pipeline, including options for service selection and deployment environments.
 
-The CapsuleBay pipeline utilizes several parameters to control the deployment and build process. Below is a detailed description of each parameter, including the available options and their purposes.
+## Pipeline Parameters Overview
 
-| Parameter  | Options                        | Description                                                  |
-|------------|--------------------------------|--------------------------------------------------------------|
-| SERVICE    | `n8n`, `portainer`, `whoami`, `all` | Specifies which stack(s) to deploy. Use `all` to deploy all services. |
-| ENVIRONMENT| `dev`, `staging`, `prod`      | Defines the target environment and the corresponding Vault path for secrets. |
-| RUN_TYPE   | `Deploy`, `Build and Deploy`   | Determines the action to take: either to deploy an existing capsule or to build and deploy a new one. |
+The CapsuleBay pipeline utilizes specific parameters to control the deployment process. Below is a detailed description of each parameter, including its options and purpose.
 
-## Vault Example
+| Parameter   | Options                          | Description                                           |
+|-------------|----------------------------------|-------------------------------------------------------|
+| SERVICE     | `n8n`, `portainer`, `whoami`, `all` | Specifies which stack(s) to deploy.                   |
+| ENVIRONMENT | `dev`, `staging`, `prod`        | Defines the target environment and corresponding Vault path. |
+| RUN_TYPE    | `Deploy`, `Build and Deploy`     | Determines whether to rebuild the image or redeploy an existing one. |
 
-To manage secrets, you can use the following commands to enable and store secrets in Vault:
+## Detailed Parameter Descriptions
+
+### SERVICE
+- **Options**:
+  - `n8n`: Deploys the n8n workflow automation tool.
+  - `portainer`: Deploys the Portainer management UI for Docker.
+  - `whoami`: Deploys a simple HTTP server for testing and debugging.
+  - `all`: Deploys all available services.
+
+### ENVIRONMENT
+- **Options**:
+  - `dev`: Targets the development environment.
+  - `staging`: Targets the staging environment for pre-production testing.
+  - `prod`: Targets the production environment for live deployment.
+
+### RUN_TYPE
+- **Options**:
+  - `Deploy`: Deploys the specified service(s) without rebuilding the images.
+  - `Build and Deploy`: Rebuilds the images and then deploys the specified service(s).
+
+## Vault Integration Example
+
+Secrets are managed using HashiCorp Vault and can be injected into the deployment process. Below is an example of how to set up secrets for the `n8n` service in the development environment:
 
 ```bash
 vault secrets enable -path=secret kv-v2
@@ -20,12 +42,11 @@ vault kv put secret/n8n/dev N8N_BASIC_AUTH_USER=admin N8N_BASIC_AUTH_PASSWORD=su
 vault kv get secret/n8n/dev
 ```
 
-Secrets are automatically injected into each service's `.env` file during deployment.
+During deployment, these secrets are automatically injected into the `.env` file for the service.
 
 ## Example Capsule Configuration
 
 ### n8n/Dockerfile
-
 ```dockerfile
 FROM docker:27.0.3-cli-alpine3.20
 RUN apk add --no-cache docker-cli-compose bash
@@ -37,7 +58,6 @@ CMD ["docker", "compose", "up", "-d"]
 ```
 
 ### n8n/docker-compose.yml
-
 ```yaml
 version: "3.9"
 services:
@@ -49,36 +69,8 @@ services:
       - .env
 ```
 
-## Security Stack
+## Security and Notifications
 
-CapsuleBay incorporates multiple layers of security checks throughout the pipeline:
+CapsuleBay integrates security checks at multiple stages of the pipeline. Notifications are sent via Discord at the end of each deployment, providing details such as service name, environment, build link, duration, and timestamp.
 
-| Layer                      | Tool            | Purpose                                               |
-|---------------------------|-----------------|-------------------------------------------------------|
-| GitHub Actions (pre-merge)| Trivy           | Scans built images for vulnerabilities.               |
-|                           | Snyk            | Scans Dockerfiles for dependency CVEs.                |
-| Jenkins (pre-deploy)     | Trivy CLI       | Rescans the final image before deployment.            |
-| Vault                     | HashiCorp Vault | Securely manages and delivers secrets.                |
-| Discord                   | Webhook alerts   | Sends notifications about build success or failure.   |
-
-## Discord Notifications
-
-At the conclusion of each pipeline run, CapsuleBay sends a notification to Discord containing:
-
-- Service name
-- Environment
-- Build link (e.g., `[Build #42](https://jenkins.example.local/job/CapsuleBay/42/)`)
-- Duration
-- Timestamp
-- User ping (`<@UserID>`)
-
-**Example Notification:**
-
-> CapsuleBay Deployment Successful  
-> Service: portainer  
-> Environment: prod  
-> Build: [#42](https://jenkins.example.local/job/CapsuleBay/42/)  
-> Duration: 2m 34s  
-> Timestamp: 2025-10-26 20:42  
-
-This structured approach ensures that all necessary parameters are clearly defined and managed throughout the CapsuleBay CI/CD pipeline.
+This structured approach ensures that each deployment is secure, traceable, and efficient, aligning with the overall goals of the CapsuleBay framework.

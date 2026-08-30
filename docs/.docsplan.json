@@ -2,11 +2,11 @@
   "pages": [
     {
       "path": "index.md",
-      "title": "Overview",
+      "title": "CapsuleBay Overview",
       "globs": [
         "README.md"
       ],
-      "summary": "An introduction to CapsuleBay, a hybrid CI/CD system for modular, image-based capsule deployments with integrated security scanning."
+      "summary": "An overview of CapsuleBay, a hybrid CI/CD system for modular, image-based capsule deployments with integrated security scanning and secret management."
     },
     {
       "path": "architecture.md",
@@ -14,7 +14,7 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Details the two CI/CD layers of CapsuleBay: GitHub Actions for cloud validation and Jenkins for self-hosted deployments."
+      "summary": "Details the two-layer CI/CD architecture of CapsuleBay, including the GitHub Actions Cloud Validation Layer and the Jenkins Self-Hosted Deployment Layer."
     },
     {
       "path": "getting_started.md",
@@ -22,7 +22,7 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Instructions for deploying the core infrastructure required for CapsuleBay, including Vault and local registry setup."
+      "summary": "Instructions for deploying the core infrastructure of CapsuleBay, including setup scripts and service URLs."
     },
     {
       "path": "capsule_management.md",
@@ -30,7 +30,7 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Guidelines for adding new capsules, including folder structure and necessary files."
+      "summary": "Guidelines for adding new capsules, including folder structure, Dockerfile, and docker-compose.yml requirements."
     },
     {
       "path": "pipeline_parameters.md",
@@ -38,23 +38,15 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Overview of the parameters used in the CapsuleBay pipeline, including options and descriptions."
+      "summary": "Explains the parameters used in the CapsuleBay pipeline, including options for service selection and deployment environments."
     },
     {
-      "path": "vault_integration.md",
-      "title": "Vault Integration",
-      "globs": [
-        "README.md"
-      ],
-      "summary": "Explains how CapsuleBay integrates with HashiCorp Vault for secret management during deployments."
-    },
-    {
-      "path": "security_stack.md",
+      "path": "security.md",
       "title": "Security Stack",
       "globs": [
         "README.md"
       ],
-      "summary": "Describes the layered security checks implemented in CapsuleBay, including tools and their purposes."
+      "summary": "Overview of the integrated security measures in CapsuleBay, including tools and processes for vulnerability scanning and secret management."
     },
     {
       "path": "discord_notifications.md",
@@ -62,7 +54,15 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Details the Discord notifications sent at the end of each pipeline run, including the information provided."
+      "summary": "Details on how CapsuleBay sends notifications to Discord at the end of each pipeline run, including message format and content."
+    },
+    {
+      "path": "repository_structure.md",
+      "title": "Repository Structure",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Describes the organization of the CapsuleBay repository, including the purpose of each directory and key files."
     }
   ]
 }
