@@ -1,9 +1,13 @@
 site_name: CapsuleBay
 site_description: Shell tooling - early / scratch
-
 plugins:
-  - techdocs-core
-
+- techdocs-core
 nav:
-  - Home: index.md
-  - Readme: readme.md
+- Overview: index.md
+- System Architecture: architecture.md
+- Infrastructure Setup: infrastructure.md
+- Capsule Structure: capsules.md
+- Getting Started: getting-started.md
+- CI/CD Pipeline: pipeline.md
+- Adding a New Capsule: adding-capsule.md
+- Pipeline Parameters: parameters.md

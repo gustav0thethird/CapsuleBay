@@ -1,0 +1,72 @@
+{
+  "pages": [
+    {
+      "path": "index.md",
+      "title": "Overview",
+      "globs": [
+        "README.md",
+        "catalog-info.yaml"
+      ],
+      "summary": "Introduction to CapsuleBay, its purpose, and key features."
+    },
+    {
+      "path": "architecture.md",
+      "title": "System Architecture",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Description of the CI/CD architecture, including GitHub Actions and Jenkins layers."
+    },
+    {
+      "path": "infrastructure.md",
+      "title": "Infrastructure Setup",
+      "globs": [
+        "infra/setup.sh",
+        "infra/docker-compose.yml"
+      ],
+      "summary": "Instructions for deploying the core infrastructure components like Vault and Registry."
+    },
+    {
+      "path": "capsules.md",
+      "title": "Capsule Structure",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Details on the structure and components of a capsule, including Dockerfile and docker-compose.yml."
+    },
+    {
+      "path": "getting-started.md",
+      "title": "Getting Started",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Step-by-step guide to deploying the core infrastructure and initializing services."
+    },
+    {
+      "path": "pipeline.md",
+      "title": "CI/CD Pipeline",
+      "globs": [
+        ".github/workflows/CI.yml",
+        ".github/workflows/snyk.yml",
+        ".gitlab-ci.yml"
+      ],
+      "summary": "Overview of the CI/CD pipeline, including build and scan processes."
+    },
+    {
+      "path": "adding-capsule.md",
+      "title": "Adding a New Capsule",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Instructions for creating and deploying a new service capsule."
+    },
+    {
+      "path": "parameters.md",
+      "title": "Pipeline Parameters",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Description of the parameters used in the CI/CD pipeline for deployment."
+    }
+  ]
+}
