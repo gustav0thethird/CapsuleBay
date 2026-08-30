@@ -1,26 +1,28 @@
 # Capsule Structure
 
-This document outlines the structure and components of a capsule within the CapsuleBay repository, including details on the Dockerfile and docker-compose.yml files.
+This document outlines the structure and components of a capsule within the CapsuleBay repository, including details on the `Dockerfile` and `docker-compose.yml` files.
 
-## Capsule Structure
+## Capsule Components
 
-Each capsule in CapsuleBay is organized with a specific directory structure that includes Dockerfiles and docker-compose.yml files for containerization and orchestration.
+A capsule in CapsuleBay is composed of several key components that facilitate modular, image-based deployments. Each capsule typically includes a `Dockerfile` for building the container image and a `docker-compose.yml` file for orchestrating the deployment of services.
 
 ### Dockerfile
 
-The Dockerfile is a script that contains a series of instructions on how to build a Docker image for the capsule. Each capsule has its own Dockerfile located in its respective directory. For example, the `whoami` capsule has the following Dockerfile:
+The `Dockerfile` defines the environment for the application. It specifies the base image, dependencies, and commands to run the application. Each capsule may have its own `Dockerfile` located in its respective directory. 
 
-```dockerfile
-# Example Dockerfile for the whoami capsule
-FROM alpine:latest
-CMD ["echo", "Hello from whoami"]
-```
+For example, the `whoami` capsule includes a `Dockerfile` that sets up a simple web service. The contents of the `Dockerfile` typically include:
 
-This Dockerfile specifies that the image is based on the latest Alpine Linux and runs a simple command that outputs a message.
+- Base image declaration
+- Installation of necessary packages
+- Copying application files into the image
+- Setting environment variables
+- Specifying the command to run the application
 
 ### docker-compose.yml
 
-The docker-compose.yml file is used to define and run multi-container Docker applications. In the CapsuleBay repository, the `infra/docker-compose.yml` file is structured as follows:
+The `docker-compose.yml` file is used to define and run multi-container Docker applications. This file specifies the services, networks, and volumes required for the capsule. 
+
+An example `docker-compose.yml` for the infrastructure components is as follows:
 
 ```yaml
 version: "3.9"
@@ -100,15 +102,6 @@ networks:
     driver: bridge
 ```
 
-#### Key Components
+### Summary
 
-- **Services**: Each service (e.g., vault, htpasswd, registry, registry-ui) is defined with its own configuration, including the image to use, ports to expose, environment variables, and volumes for persistent storage.
-- **Networks**: The `infra` network is defined to allow communication between the services.
-
-### CI/CD Integration
-
-The repository includes CI/CD configurations in `.github/workflows/CI.yml` and `.github/workflows/snyk.yml` for building and scanning Docker images. These workflows ensure that images are built and scanned for vulnerabilities upon code changes.
-
-### Conclusion
-
-The structure of a capsule in CapsuleBay is designed to facilitate easy deployment and management of services using Docker. Each capsule's Dockerfile and docker-compose.yml play crucial roles in defining how the services are built and orchestrated.
+Each capsule in CapsuleBay is structured to include a `Dockerfile` for building its image and a `docker-compose.yml` file for managing its services. This modular approach allows for flexible and secure deployments, leveraging Docker's capabilities for containerization and orchestration.

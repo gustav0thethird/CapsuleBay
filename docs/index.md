@@ -1,19 +1,19 @@
 # Overview
 
-## Introduction to CapsuleBay
-
-CapsuleBay is a shell tooling project designed for early-stage and scratch development. It serves as a repository for various shell-related tools and scripts, facilitating experimentation and prototyping.
+CapsuleBay is a hybrid CI/CD framework designed for modular, image-based deployments with integrated security scanning. It aims to streamline the continuous integration and continuous deployment processes while ensuring that security is a fundamental aspect of the workflow.
 
 ## Purpose
 
-The primary purpose of CapsuleBay is to provide a flexible environment for developers to create, test, and refine shell tools. It acts as a sandbox for exploring new ideas and functionalities in shell scripting.
+The primary purpose of CapsuleBay is to facilitate efficient and secure deployment of applications through a modular architecture. By leveraging containerization, CapsuleBay allows for flexible deployment strategies and enhances the overall automation of the CI/CD pipeline.
 
 ## Key Features
 
-- **Shell Tooling**: CapsuleBay focuses on shell scripting, offering a collection of tools that can be utilized for various tasks.
-- **Experimental Lifecycle**: The project is in an experimental phase, allowing for rapid iteration and development of new features.
-- **Archival System**: CapsuleBay is categorized under an archive system, indicating that it serves as a repository for tools that may not be in active development but are still valuable for reference and experimentation.
-- **GitHub Repository**: The project is hosted on GitHub, providing easy access to the source code and documentation. For more information, visit the [CapsuleBay GitHub page](https://github.com/gustav0thethird/CapsuleBay).
-- **Owner**: The project is maintained by gtully, ensuring that there is a dedicated individual overseeing its development and updates.
+- **Hybrid CI/CD Framework**: Combines various methodologies to support diverse deployment scenarios.
+- **Modular Architecture**: Enables users to create and manage deployments in a modular fashion, promoting reusability and maintainability.
+- **Image-Based Deployments**: Utilizes container images for consistent and reliable application deployment.
+- **Integrated Security Scanning**: Incorporates security checks within the CI/CD pipeline to identify vulnerabilities early in the development process.
+- **Automation**: Streamlines workflows to reduce manual intervention and increase efficiency in deployment processes.
+- **Support for Docker**: Fully compatible with Docker, allowing users to leverage containerization for their applications.
+- **Experimental Lifecycle**: Currently in an experimental phase, encouraging user feedback and contributions for further development.
 
-CapsuleBay is tagged with relevant keywords such as shell, scratch, and archive, making it easier to identify its focus and purpose within the broader context of shell tooling.
+For more information, refer to the [GitHub repository](https://github.com/gustav0thethird/CapsuleBay).

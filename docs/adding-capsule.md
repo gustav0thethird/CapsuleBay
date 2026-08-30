@@ -1,60 +1,65 @@
 # Adding a New Capsule
 
-To create and deploy a new service capsule in the CapsuleBay repository, follow the steps outlined below.
+To create and deploy a new service capsule in CapsuleBay, follow the steps outlined below.
 
 ## Step 1: Create the Capsule Directory
 
-1. Navigate to the root of the CapsuleBay repository.
-2. Create a new directory for your capsule under the appropriate service folder (e.g., `whoami`, `n8n`, etc.).
+1. Navigate to the `capsules` directory in your local repository.
+2. Create a new directory for your capsule. The name should reflect the service you are creating (e.g., `my-new-service`).
 
 ## Step 2: Create the Dockerfile
 
-1. Inside your capsule directory, create a `Dockerfile`.
-2. Define the necessary instructions for building your service. Ensure that you follow the structure used in existing capsules.
+1. Inside your new capsule directory, create a `Dockerfile`.
+2. Define the necessary instructions to build your service image. Ensure that the base image and any dependencies are correctly specified.
 
 ## Step 3: Create the Docker Compose File
 
-1. In your capsule directory, create a `docker-compose.yml` file.
-2. Define the services, networks, and volumes required for your capsule. Refer to existing `docker-compose.yml` files for structure and syntax.
+1. In the same directory, create a `docker-compose.yml` file.
+2. Define the services, networks, and volumes required for your capsule. Ensure that the service name matches the directory name.
 
-## Step 4: Update CI Workflows
+## Step 4: Update CI/CD Configuration
 
-1. Open the `.github/workflows/CI.yml` file.
-2. Add a new job for your capsule under the `build` section. Ensure it follows the format of existing jobs, specifying the context and tags appropriately.
+1. Modify the `.github/workflows/CI.yml` file to include your new capsule.
+   - Add a new job for building and scanning your capsule image.
+   - Ensure that the image tag reflects your capsule name.
 
-## Step 5: Security Scanning
+2. Update the `.github/workflows/snyk.yml` file to include a scan for your new Dockerfile.
 
-1. Open the `.github/workflows/snyk.yml` file.
-2. Add a new step to build and scan your capsule's Dockerfile. Use the same approach as existing entries, ensuring to set the image name correctly.
+## Step 5: Create a Catalog Entry
 
-## Step 6: Testing Your Capsule
+1. Create or update the `catalog-info.yaml` file in the root of your capsule directory.
+2. Ensure that the metadata includes the name, description, and any relevant annotations.
 
-1. Run the Docker Compose command to build and start your capsule locally:
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-new-service
+  description: A brief description of your service.
+spec:
+  type: service
+  lifecycle: experimental
+  owner: your-username
+```
+
+## Step 6: Build and Test Your Capsule
+
+1. Use Docker Compose to build and run your capsule locally:
+
    ```bash
    docker-compose up --build
    ```
-2. Verify that your service is running as expected.
 
-## Step 7: Commit and Push Changes
+2. Verify that the service is running as expected.
 
-1. Add your new capsule directory and files to the Git index:
-   ```bash
-   git add <your-capsule-directory>
-   ```
-2. Commit your changes:
-   ```bash
-   git commit -m "Add new capsule: <capsule-name>"
-   ```
-3. Push your changes to the repository:
-   ```bash
-   git push origin <branch-name>
-   ```
+## Step 7: Deploy Your Capsule
 
-## Step 8: Monitor CI/CD Pipeline
+1. Push your changes to the repository.
+2. The CI/CD pipeline will automatically trigger, building and scanning your capsule image.
 
-1. After pushing, monitor the GitHub Actions tab for the status of your CI/CD pipeline.
-2. Ensure that the build and security scans complete successfully.
+## Step 8: Monitor and Maintain
 
-## Conclusion
+1. Monitor the CI/CD pipeline for any issues during the build and scan processes.
+2. Regularly update your capsule as needed, following the same steps for modifications.
 
-Following these steps will allow you to create and deploy a new service capsule in the CapsuleBay repository. Make sure to adhere to existing conventions and practices for consistency.
+By following these steps, you can successfully create and deploy a new service capsule in CapsuleBay.
