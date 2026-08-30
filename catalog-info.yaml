@@ -2,18 +2,21 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: CapsuleBay
-  description: Shell tooling - early / scratch
+  description: CapsuleBay is a hybrid CI/CD framework for modular, image-based deployments
+    with integrated security scanning.
   annotations:
     backstage.io/techdocs-ref: dir:.
     gitlab.com/project-slug: yditj/projects/archive/CapsuleBay
   links:
-    - url: https://github.com/gustav0thethird/CapsuleBay
-      title: GitHub
-      icon: github
+  - url: https://github.com/gustav0thethird/CapsuleBay
+    title: GitHub
+    icon: github
   tags:
-    - shell
-    - scratch
-    - archive
+  - ci-cd
+  - docker
+  - security
+  - automation
+  - vault
 spec:
   type: tool
   lifecycle: experimental
