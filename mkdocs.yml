@@ -3,11 +3,11 @@ site_description: Shell tooling - early / scratch
 plugins:
 - techdocs-core
 nav:
-- Overview: index.md
+- CapsuleBay Overview: index.md
 - System Architecture: architecture.md
 - Getting Started: getting_started.md
 - Managing Capsules: capsule_management.md
 - Pipeline Parameters: pipeline_parameters.md
-- Vault Integration: vault_integration.md
-- Security Stack: security_stack.md
+- Security Stack: security.md
 - Discord Notifications: discord_notifications.md
+- Repository Structure: repository_structure.md

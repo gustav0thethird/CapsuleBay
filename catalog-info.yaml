@@ -10,8 +10,8 @@ metadata:
     yditj.home/capabilities: Self-contained deployment capsules; Automated build,
       push, scan, and deploy pipeline; Vault-based secret management; Per-service
       modular builds; Immutable image capsules; Automated VM lifecycle management
-      via Proxmox API; Security scanning with Trivy and Snyk; Discord notifications
-      for build status
+      via Proxmox API; Security scanning using Trivy and Snyk; Discord notifications
+      for build status and details
   links:
   - url: https://github.com/gustav0thethird/CapsuleBay
     title: GitHub

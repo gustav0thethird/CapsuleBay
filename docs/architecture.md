@@ -1,26 +1,28 @@
 # System Architecture
 
-CapsuleBay is divided into two CI/CD layers:
+CapsuleBay is structured around a two-layer CI/CD architecture that integrates both cloud-based and self-hosted components to facilitate modular, image-based deployments.
 
-### 1. GitHub Actions – Cloud Validation Layer
-This layer runs automatically on every push or pull request and is responsible for:
-- Building capsule images for validation.
-- Running Trivy image scans to identify vulnerabilities with HIGH and CRITICAL severity.
-- Executing Snyk Dockerfile scans to detect dependency-level issues.
-- Uploading scan reports as artifacts for review.
+## 1. GitHub Actions – Cloud Validation Layer
 
-This process ensures that all commits are secure, compliant, and buildable before they reach the Jenkins deployment layer.
+This layer operates automatically on every push or pull request to ensure code integrity and security before deployment:
 
-### 2. Jenkins – Self-Hosted Deployment Layer
-This layer manages controlled, Vault-secured deployments within your local area network (LAN). Its responsibilities include:
-- Building, tagging, and pushing capsule images to a local registry.
-- Dynamically retrieving secrets from Vault.
-- Ensuring the target virtual machine (VM) is powered on using the Proxmox API.
-- Performing a second security scan on built images using Trivy.
-- Deploying capsules remotely with their embedded `docker-compose.yml`.
-- Sending Discord notifications that include service details, environment, build link, duration, and timestamp.
+- **Builds Capsule Images**: Each service's Docker image is built for validation.
+- **Trivy Image Scans**: Conducts security scans focusing on HIGH and CRITICAL vulnerabilities.
+- **Snyk Dockerfile Scans**: Analyzes Dockerfiles for dependency-level vulnerabilities.
+- **Artifact Uploads**: Scan reports are uploaded as artifacts for review.
 
----
+This layer ensures that all commits are secure, compliant, and buildable prior to reaching the Jenkins deployment layer.
+
+## 2. Jenkins – Self-Hosted Deployment Layer
+
+The Jenkins layer manages controlled deployments within a local area network (LAN), utilizing Vault for secure secret management:
+
+- **Builds, Tags, and Pushes Capsule Images**: Capsule images are built and pushed to a local registry.
+- **Dynamic Secret Retrieval**: Secrets are fetched from Vault dynamically during the deployment process.
+- **VM Lifecycle Management**: Ensures that the target virtual machine (VM) is powered on using the Proxmox API.
+- **Final Image Scans**: Conducts a secondary scan of the built images using Trivy.
+- **Remote Deployments**: Deploys the capsules using the embedded `docker-compose.yml`.
+- **Discord Notifications**: Sends notifications to the team with details about the deployment status, including service name, environment, build link, duration, and timestamp.
 
 ## Architecture Diagram
 
@@ -71,8 +73,6 @@ flowchart TD
     J6 --> J7
 ```
 
----
-
 ## Summary
 
-CapsuleBay's architecture leverages both GitHub Actions for cloud-based validation and Jenkins for self-hosted deployments, ensuring a robust and secure CI/CD pipeline. Each layer plays a critical role in maintaining the integrity and security of the deployment process, from initial code validation to final deployment.
+The CapsuleBay architecture effectively combines cloud-based validation with self-hosted deployment, ensuring a secure and efficient CI/CD pipeline. Each layer plays a critical role in maintaining the integrity and security of the deployment process, allowing for modular and scalable service management.
