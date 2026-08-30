@@ -1,0 +1,42 @@
+{
+  ".github/workflows/CI.yml": {
+    "sha": "fe9e421192c4",
+    "summary": "This file defines a GitHub Actions workflow for building Docker images and performing security scans using Trivy on push and pull request events."
+  },
+  ".github/workflows/snyk.yml": {
+    "sha": "4096c9b5d2e6",
+    "summary": "This file sets up a GitHub Actions workflow to scan Dockerfiles for vulnerabilities using Snyk on push, pull request, and manual trigger events."
+  },
+  ".gitlab-ci.yml": {
+    "sha": "a40e37e20408",
+    "summary": "This file configures a GitLab CI pipeline that includes templates for AI documentation and a GitHub mirror."
+  },
+  "catalog-info.yaml": {
+    "sha": "36f927639142",
+    "summary": "This file contains metadata for the CapsuleBay component, describing its purpose and providing links and annotations for Backstage integration."
+  },
+  "infra/docker-compose.yml": {
+    "sha": "1c5de377c2f4",
+    "summary": "This file defines a Docker Compose configuration for setting up services like Vault, a Docker registry, and a UI for managing the registry."
+  },
+  "infra/setup.sh": {
+    "sha": "022b1761afa0",
+    "summary": "This script automates the setup of the CapsuleBay infrastructure, including creating necessary directories, configuring Vault, and launching Docker services."
+  },
+  "mkdocs.yml": {
+    "sha": "89c4f0c660eb",
+    "summary": "Configures the documentation site for CapsuleBay, detailing its structure and navigation."
+  },
+  "n8n/docker-compose.yml": {
+    "sha": "7aad65ae2cb8",
+    "summary": "Defines the Docker setup for the n8n workflow automation tool, including environment variables and port mappings."
+  },
+  "portainer/docker-compose.yml": {
+    "sha": "a9819bb46a77",
+    "summary": "Sets up the Portainer container management interface with specified ports and volume mappings."
+  },
+  "whoami/docker-compose.yml": {
+    "sha": "e4235687ae2c",
+    "summary": "Configures the whoami service, a simple HTTP server for testing, with port and environment settings."
+  }
+}

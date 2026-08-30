@@ -1,40 +1,78 @@
 # System Architecture
 
-## CI/CD Architecture Overview
+CapsuleBay is divided into two CI/CD layers:
 
-The CapsuleBay project employs a hybrid CI/CD architecture that integrates GitHub Actions and Jenkins for modular, image-based deployments with a focus on security scanning.
+### 1. GitHub Actions – Cloud Validation Layer
+This layer runs automatically on every push or pull request and is responsible for:
+- Building capsule images for validation.
+- Running Trivy image scans to identify vulnerabilities with HIGH and CRITICAL severity.
+- Executing Snyk Dockerfile scans to detect dependency-level issues.
+- Uploading scan reports as artifacts for review.
 
-### GitHub Actions
+This process ensures that all commits are secure, compliant, and buildable before they reach the Jenkins deployment layer.
 
-The CI/CD pipeline is primarily managed through GitHub Actions, which automates the build and security scanning processes. There are two main workflows defined in the `.github/workflows` directory:
+### 2. Jenkins – Self-Hosted Deployment Layer
+This layer manages controlled, Vault-secured deployments within your local area network (LAN). Its responsibilities include:
+- Building, tagging, and pushing capsule images to a local registry.
+- Dynamically retrieving secrets from Vault.
+- Ensuring the target virtual machine (VM) is powered on using the Proxmox API.
+- Performing a second security scan on built images using Trivy.
+- Deploying capsules remotely with their embedded `docker-compose.yml`.
+- Sending Discord notifications that include service details, environment, build link, duration, and timestamp.
 
-1. **CI.yml**: This workflow is triggered on pushes and pull requests to any branch. It includes the following jobs:
-   - **Checkout**: Uses the `actions/checkout@v4` action to pull the repository code.
-   - **Set up Docker Buildx**: Configures Docker Buildx for building images.
-   - **Build images**: Utilizes `docker/build-push-action@v5` to build Docker images for validation.
-   - **Security Scan (Trivy)**: Runs a security scan using the Trivy action to identify vulnerabilities in the built images, specifically targeting high and critical severity issues.
+---
 
-2. **snyk.yml**: This workflow is also triggered on pushes and pull requests, as well as manually via workflow dispatch. It includes:
-   - **Checkout code**: Similar to the CI.yml workflow, it checks out the code.
-   - **Set up Docker and Snyk**: Installs Snyk and authenticates using a secret token.
-   - **Build and scan all Dockerfiles**: Searches for Dockerfiles in the repository, builds Docker images, and scans them for vulnerabilities using Snyk, reporting any issues with a severity threshold set to high.
+## Architecture Diagram
 
-### Jenkins Integration
+```mermaid
+flowchart TD
+    subgraph G[GitHub Actions]
+        GA1[Build Capsule Images]
+        GA2[Trivy Image Scan]
+        GA3[Snyk Dockerfile Scan]
+        GA4[Upload Scan Reports]
+    end
 
-In addition to GitHub Actions, CapsuleBay utilizes Jenkins for certain CI/CD tasks. The Jenkins pipeline is defined in the `Jenkinsfile`, which outlines the steps for building, testing, and deploying applications. The specifics of the Jenkins pipeline are not detailed in the provided files, but it typically includes stages for building Docker images, running tests, and deploying to various environments.
+    subgraph J[Jenkins Pipeline]
+        J1[Confirm Selection]
+        J2[Build & Push Capsule Images]
+        J3[Trivy Security Scan]
+        J4["Ensure VM is Running (Proxmox API)"]
+        J5[Fetch Secrets from Vault]
+        J6[Pull & Deploy via SSH]
+        J7[Send Discord Notification]
+    end
 
-### Security Considerations
+    subgraph I[Infrastructure Host: infra.local]
+        I1[Vault]
+        I2[Local Registry]
+        I3[Registry UI]
+    end
 
-Both GitHub Actions workflows incorporate security scanning tools (Trivy and Snyk) to ensure that vulnerabilities are identified early in the development process. This focus on security is a critical aspect of the CI/CD architecture, aimed at maintaining the integrity and safety of deployed applications.
+    subgraph P[Proxmox Hypervisor]
+        P1[VM Check]
+        P2[Start VM if Stopped]
+    end
 
-### Infrastructure Components
+    subgraph H[Docker Host VM]
+        H1[Pull Capsule Image]
+        H2["Inject Secrets (.env)"]
+        H3[Extract docker-compose.yml]
+        H4[Deploy via docker compose up -d]
+    end
 
-The infrastructure for CapsuleBay includes several key components defined in the `infra/docker-compose.yml` file:
+    GA2 --> GA4
+    GA3 --> GA4
+    J1 --> J2 --> I2
+    J2 --> J3
+    J3 --> J4 --> P1 --> P2
+    J4 --> J5 --> I1
+    J5 --> J6 --> H1 --> H2 --> H3 --> H4
+    J6 --> J7
+```
 
-- **Vault**: A HashiCorp Vault instance for managing secrets and sensitive data.
-- **Docker Registry**: A private Docker registry for storing built images, secured with basic authentication.
-- **Registry UI**: A user interface for managing the Docker registry.
+---
 
-These components work together to support the CI/CD processes, providing a secure environment for building and deploying applications. 
+## Summary
 
-Overall, the CapsuleBay architecture leverages both GitHub Actions and Jenkins to create a robust CI/CD pipeline, ensuring efficient and secure software delivery.
+CapsuleBay's architecture leverages both GitHub Actions for cloud-based validation and Jenkins for self-hosted deployments, ensuring a robust and secure CI/CD pipeline. Each layer plays a critical role in maintaining the integrity and security of the deployment process, from initial code validation to final deployment.
