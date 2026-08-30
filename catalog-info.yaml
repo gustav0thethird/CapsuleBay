@@ -2,11 +2,16 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: CapsuleBay
-  description: CapsuleBay is a hybrid CI/CD framework for modular, image-based deployments
-    with integrated security scanning.
+  description: CapsuleBay is a hybrid CI/CD framework for modular, image-based capsule
+    deployments with integrated security scanning.
   annotations:
     backstage.io/techdocs-ref: dir:.
     gitlab.com/project-slug: yditj/projects/archive/CapsuleBay
+    yditj.home/capabilities: Self-contained deployment capsules; Automated build,
+      push, scan, and deploy pipeline; Vault-based secret management; Per-service
+      modular builds; Immutable image capsules; Automated VM lifecycle management
+      via Proxmox API; Security scanning with Trivy and Snyk; Discord notifications
+      for build status
   links:
   - url: https://github.com/gustav0thethird/CapsuleBay
     title: GitHub
@@ -15,8 +20,8 @@ metadata:
   - ci-cd
   - docker
   - security
-  - automation
   - deployment
+  - automation
 spec:
   type: tool
   lifecycle: experimental

@@ -4,10 +4,9 @@
       "path": "index.md",
       "title": "Overview",
       "globs": [
-        "README.md",
-        "catalog-info.yaml"
+        "README.md"
       ],
-      "summary": "Introduction to CapsuleBay, its purpose, and key features."
+      "summary": "An introduction to CapsuleBay, a hybrid CI/CD system for modular, image-based capsule deployments with integrated security scanning."
     },
     {
       "path": "architecture.md",
@@ -15,58 +14,55 @@
       "globs": [
         "README.md"
       ],
-      "summary": "Description of the CI/CD architecture, including GitHub Actions and Jenkins layers."
+      "summary": "Details the two CI/CD layers of CapsuleBay: GitHub Actions for cloud validation and Jenkins for self-hosted deployments."
     },
     {
-      "path": "infrastructure.md",
-      "title": "Infrastructure Setup",
-      "globs": [
-        "infra/setup.sh",
-        "infra/docker-compose.yml"
-      ],
-      "summary": "Instructions for deploying the core infrastructure components like Vault and Registry."
-    },
-    {
-      "path": "capsules.md",
-      "title": "Capsule Structure",
-      "globs": [
-        "README.md"
-      ],
-      "summary": "Details on the structure and components of a capsule, including Dockerfile and docker-compose.yml."
-    },
-    {
-      "path": "getting-started.md",
+      "path": "getting_started.md",
       "title": "Getting Started",
       "globs": [
         "README.md"
       ],
-      "summary": "Step-by-step guide to deploying the core infrastructure and initializing services."
+      "summary": "Instructions for deploying the core infrastructure required for CapsuleBay, including Vault and local registry setup."
     },
     {
-      "path": "pipeline.md",
-      "title": "CI/CD Pipeline",
-      "globs": [
-        ".github/workflows/CI.yml",
-        ".github/workflows/snyk.yml",
-        ".gitlab-ci.yml"
-      ],
-      "summary": "Overview of the CI/CD pipeline, including build and scan processes."
-    },
-    {
-      "path": "adding-capsule.md",
-      "title": "Adding a New Capsule",
+      "path": "capsule_management.md",
+      "title": "Managing Capsules",
       "globs": [
         "README.md"
       ],
-      "summary": "Instructions for creating and deploying a new service capsule."
+      "summary": "Guidelines for adding new capsules, including folder structure and necessary files."
     },
     {
-      "path": "parameters.md",
+      "path": "pipeline_parameters.md",
       "title": "Pipeline Parameters",
       "globs": [
         "README.md"
       ],
-      "summary": "Description of the parameters used in the CI/CD pipeline for deployment."
+      "summary": "Overview of the parameters used in the CapsuleBay pipeline, including options and descriptions."
+    },
+    {
+      "path": "vault_integration.md",
+      "title": "Vault Integration",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Explains how CapsuleBay integrates with HashiCorp Vault for secret management during deployments."
+    },
+    {
+      "path": "security_stack.md",
+      "title": "Security Stack",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Describes the layered security checks implemented in CapsuleBay, including tools and their purposes."
+    },
+    {
+      "path": "discord_notifications.md",
+      "title": "Discord Notifications",
+      "globs": [
+        "README.md"
+      ],
+      "summary": "Details the Discord notifications sent at the end of each pipeline run, including the information provided."
     }
   ]
 }

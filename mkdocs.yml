@@ -5,9 +5,9 @@ plugins:
 nav:
 - Overview: index.md
 - System Architecture: architecture.md
-- Infrastructure Setup: infrastructure.md
-- Capsule Structure: capsules.md
-- Getting Started: getting-started.md
-- CI/CD Pipeline: pipeline.md
-- Adding a New Capsule: adding-capsule.md
-- Pipeline Parameters: parameters.md
+- Getting Started: getting_started.md
+- Managing Capsules: capsule_management.md
+- Pipeline Parameters: pipeline_parameters.md
+- Vault Integration: vault_integration.md
+- Security Stack: security_stack.md
+- Discord Notifications: discord_notifications.md
