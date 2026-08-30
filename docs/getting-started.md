@@ -1,12 +1,13 @@
 # Getting Started
 
-This guide provides a step-by-step process to deploy the core infrastructure and initialize services for CapsuleBay.
+This guide provides a step-by-step process for deploying the core infrastructure and initializing services for CapsuleBay.
 
 ## Prerequisites
 
-Ensure you have the following installed on your system:
+Ensure you have the following installed on your machine:
 
 - Docker
+- Docker Compose
 - Curl
 - OpenSSL
 
@@ -21,35 +22,39 @@ cd CapsuleBay
 
 ## Step 2: Set Up Environment Variables
 
-Before running the setup script, you may want to customize the environment variables. You can set the following variables in your shell or modify the `setup.sh` script:
+Create a `.env` file in the `infra` directory to define necessary environment variables:
 
-- `BASE_DIR`: Directory for infrastructure files (default: `/opt/infra`)
-- `LAN_IP`: Local IP address (default: detected automatically)
-- `REGISTRY_TITLE`: Title for the Docker registry (default: `Local Registry`)
-- `JENKINS_USER`: Username for Jenkins (default: `jenkins`)
-- `JENKINS_PASS`: Password for Jenkins (default: randomly generated)
+```bash
+cd infra
+cat > .env <<EOF
+LAN_IP=$(hostname -I | awk '{print $1}')
+REGISTRY_TITLE=Local Registry
+JENKINS_USER=jenkins
+JENKINS_PASS=$(openssl rand -hex 16)
+EOF
+```
 
 ## Step 3: Run the Setup Script
 
-Execute the setup script to initialize the infrastructure:
+Execute the `setup.sh` script to initialize the infrastructure:
 
 ```bash
-bash infra/setup.sh
+chmod +x setup.sh
+./setup.sh
 ```
 
 This script will:
 
-1. Create necessary directories for Vault, Docker registry, and authentication.
-2. Generate a Vault configuration file.
-3. Create a `.env` file with environment variables.
-4. Save Jenkins credentials securely in a `.secrets` file.
+- Create necessary directories for Vault, Registry, and authentication.
+- Generate a Vault configuration file.
+- Create a Docker Compose file for the infrastructure.
+- Save Jenkins credentials securely.
 
 ## Step 4: Start the Services
 
-Navigate to the `infra` directory and start the services using Docker Compose:
+Use Docker Compose to start the services defined in `docker-compose.yml`:
 
 ```bash
-cd infra
 docker-compose up -d
 ```
 
@@ -57,37 +62,47 @@ This command will start the following services:
 
 - **Vault**: A tool for securely accessing secrets.
 - **Docker Registry**: A private registry for storing Docker images.
-- **Registry UI**: A web interface for managing the Docker registry.
-- **Htpasswd Generator**: A service to generate htpasswd files for authentication.
+- **Registry UI**: A user interface for managing the Docker Registry.
+- **Htpasswd Generator**: A service to create a password file for registry authentication.
 
 ## Step 5: Verify the Services
 
-After starting the services, verify that they are running correctly:
-
-- Vault should be accessible at `http://<LAN_IP>:8200`
-- Docker Registry should be accessible at `http://<LAN_IP>:5000`
-- Registry UI should be accessible at `http://<LAN_IP>:5001`
-
-You can check the status of the services with:
+Check the status of the running services:
 
 ```bash
 docker-compose ps
 ```
 
-## Step 6: Accessing Vault
+You should see the services listed as running. You can access the Vault UI at `http://<LAN_IP>:8200` and the Docker Registry UI at `http://<LAN_IP>:5001`.
 
-To interact with Vault, you can use the Vault CLI or the web UI. Ensure you initialize and unseal Vault before using it.
+## Step 6: Initialize Vault
 
-## Step 7: Stopping the Services
-
-To stop the services, run:
+To initialize Vault, run the following command:
 
 ```bash
-docker-compose down
+docker exec -it vault vault operator init
 ```
 
-This command will stop and remove the containers created by Docker Compose.
+Follow the instructions to save the unseal keys and the root token securely.
+
+## Step 7: Unseal Vault
+
+Use the unseal keys obtained from the initialization step to unseal Vault:
+
+```bash
+docker exec -it vault vault operator unseal <unseal_key_1>
+docker exec -it vault vault operator unseal <unseal_key_2>
+docker exec -it vault vault operator unseal <unseal_key_3>
+```
+
+## Step 8: Login to Vault
+
+Log in to Vault using the root token:
+
+```bash
+docker exec -it vault vault login <root_token>
+```
 
 ## Conclusion
 
-You have successfully deployed the core infrastructure for CapsuleBay. You can now proceed to configure and use the services as needed.
+You have successfully deployed the core infrastructure for CapsuleBay and initialized the services. You can now proceed to configure and use the services as needed.

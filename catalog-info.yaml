@@ -16,7 +16,7 @@ metadata:
   - docker
   - security
   - automation
-  - vault
+  - deployment
 spec:
   type: tool
   lifecycle: experimental

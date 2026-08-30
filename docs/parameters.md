@@ -1,96 +1,103 @@
 # Pipeline Parameters
 
-This document describes the parameters used in the CI/CD pipeline for deployment in the CapsuleBay repository.
+This document outlines the parameters used in the CI/CD pipeline for deployment in the CapsuleBay repository.
 
-## CI Workflow Parameters
+## GitHub Actions CI Workflow Parameters
 
-### General Parameters
+### CI.yml
 
 - **on**: Specifies the events that trigger the workflow.
-  - **push**: Triggers the workflow on push events to any branch.
-  - **pull_request**: Triggers the workflow on pull request events.
+  - **push**: Triggers on pushes to any branch.
+  - **pull_request**: Triggers on pull requests.
 
-### Jobs
+- **jobs**: Defines the jobs that will run as part of the workflow.
+  - **build**: The job responsible for building the application.
+    - **runs-on**: Specifies the environment for the job (e.g., `ubuntu-latest`).
+    - **steps**: A sequence of steps to execute.
+      - **Checkout**: Uses `actions/checkout@v4` to check out the repository.
+      - **Set up Docker Buildx**: Uses `docker/setup-buildx-action@v3` to set up Docker Buildx.
+      - **Build images**: Uses `docker/build-push-action@v5` to build Docker images.
+        - **context**: Path to the Docker context (e.g., `./whoami`).
+        - **tags**: Tags for the built image (e.g., `capsulebay/whoami:test`).
+        - **load**: Indicates whether to load the image into the local Docker daemon.
+      - **Security Scan (Trivy)**: Uses `aquasecurity/trivy-action@master` to perform a security scan.
+        - **image-ref**: Reference to the image to scan (e.g., `capsulebay/whoami:test`).
+        - **format**: Output format for the scan results (e.g., `table`).
+        - **severity**: Specifies the severity levels to report (e.g., `HIGH,CRITICAL`).
 
-#### Build Job
+### Snyk Workflow Parameters
 
-- **runs-on**: Specifies the type of runner that the job will run on. In this case, it is set to `ubuntu-latest`.
+### snyk.yml
 
-##### Steps
+- **on**: Specifies the events that trigger the workflow.
+  - **push**: Triggers on pushes to any branch.
+  - **pull_request**: Triggers on pull requests.
+  - **workflow_dispatch**: Allows manual triggering of the workflow.
 
-1. **Checkout**
-   - **uses**: `actions/checkout@v4`
-   - Checks out the repository code.
-
-2. **Set up Docker Buildx**
-   - **uses**: `docker/setup-buildx-action@v3`
-   - Sets up Docker Buildx for building multi-platform images.
-
-3. **Build images (for validation)**
-   - **uses**: `docker/build-push-action@v5`
-   - **with**:
-     - **context**: `./whoami`
-     - **tags**: `capsulebay/whoami:test`
-     - **load**: `true`
-   - Builds the Docker image for the `whoami` service.
-
-4. **Security Scan (Trivy)**
-   - **uses**: `aquasecurity/trivy-action@master`
-   - **with**:
-     - **image-ref**: `capsulebay/whoami:test`
-     - **format**: `table`
-     - **severity**: `HIGH,CRITICAL`
-   - Scans the built image for vulnerabilities.
-
-#### Snyk Scan Job
-
-- **runs-on**: Specifies the runner type as `ubuntu-latest`.
-
-##### Steps
-
-1. **Checkout code**
-   - **uses**: `actions/checkout@v4`
-   - Checks out the repository code.
-
-2. **Set up Docker and Snyk**
-   - **run**: 
-     - Updates the package list and installs Snyk.
-     - Authenticates Snyk using the secret token `${{ secrets.SNYK_TOKEN }}`.
-
-3. **Build and scan all Dockerfiles**
-   - **run**: 
-     - Searches for Dockerfiles in the repository.
-     - Builds each Dockerfile found and scans it using Snyk.
-     - **image_name**: Constructed from the directory name of the Dockerfile.
-     - **severity-threshold**: Set to `high` to filter results.
+- **jobs**: Defines the jobs that will run as part of the workflow.
+  - **snyk-scan**: The job responsible for scanning Dockerfiles.
+    - **runs-on**: Specifies the environment for the job (e.g., `ubuntu-latest`).
+    - **steps**: A sequence of steps to execute.
+      - **Checkout code**: Uses `actions/checkout@v4` to check out the repository.
+      - **Set up Docker and Snyk**: Installs Snyk and authenticates using a secret token.
+        - **snyk auth**: Uses `${{ secrets.SNYK_TOKEN }}` for authentication.
+      - **Build and scan all Dockerfiles**: A script that finds and scans all Dockerfiles.
+        - **find**: Searches for Dockerfiles in the repository.
+        - **docker build**: Builds the Docker image for each Dockerfile found.
+        - **snyk container test**: Tests the built image for vulnerabilities.
 
 ## GitLab CI Parameters
 
-### Include
+### .gitlab-ci.yml
 
 - **include**: Specifies external CI templates to include.
-  - **project**: `yditj/ci-templates`
-  - **file**: `ai-docs.yml` and `mirror.yml`
+  - **project**: The project from which to include templates (e.g., `yditj/ci-templates`).
+  - **file**: The specific template files to include (e.g., `ai-docs.yml`, `mirror.yml`).
 
-## Environment Variables
+## Jenkinsfile Parameters
 
-### Docker Compose Parameters
+- The Jenkinsfile is not detailed in the provided sources. Please refer to the Jenkins documentation for specific parameters used in Jenkins pipelines.
 
-- **LAN_IP**: The local area network IP address, defaults to the first IP address of the host.
-- **REGISTRY_TITLE**: Title for the local Docker registry, defaults to "Local Registry".
-- **JENKINS_USER**: Username for Jenkins, defaults to "jenkins".
-- **JENKINS_PASS**: Password for Jenkins, generated if not provided.
+## Docker Compose Parameters
 
-### Vault Configuration
+### infra/docker-compose.yml
 
-- **VAULT_PORT**: Port for the Vault service, set to `8200`.
-- **REGISTRY_PORT**: Port for the Docker registry, set to `5000`.
-- **REGISTRY_UI_PORT**: Port for the Docker registry UI, set to `5001`.
+- **version**: Specifies the version of the Docker Compose file format.
+- **services**: Defines the services that will be run.
+  - **vault**: Configuration for the Vault service.
+    - **image**: Docker image to use (e.g., `hashicorp/vault:1.15.4`).
+    - **container_name**: Name of the container (e.g., `vault`).
+    - **ports**: Ports to expose (e.g., `8200:8200`).
+    - **environment**: Environment variables for the service (e.g., `LAN_IP=${LAN_IP}`).
+    - **volumes**: Mounts for persistent storage.
+    - **command**: Command to run the service.
+    - **restart**: Restart policy (e.g., `unless-stopped`).
+    - **networks**: Networks to which the service belongs.
 
-## Healthcheck Parameters
+  - **htpasswd**: Configuration for the htpasswd generator service.
+    - **image**: Docker image to use (e.g., `httpd:alpine`).
+    - **entrypoint**: Command to generate htpasswd file.
+    - **volumes**: Mounts for persistent storage.
+    - **restart**: Restart policy.
 
-- **healthcheck**: Defines the health check for the Docker registry.
-  - **test**: Command to check the health of the registry.
-  - **interval**: Time between health checks, set to `15s`.
-  - **timeout**: Time to wait for a health check to succeed, set to `5s`.
-  - **retries**: Number of retries before marking the service as unhealthy, set to `10`.
+  - **registry**: Configuration for the Docker registry service.
+    - **image**: Docker image to use (e.g., `registry:2.8.3`).
+    - **depends_on**: Specifies dependencies for the service.
+    - **container_name**: Name of the container (e.g., `docker-registry`).
+    - **ports**: Ports to expose (e.g., `${LAN_IP}:5000:5000`).
+    - **environment**: Environment variables for the service.
+    - **volumes**: Mounts for persistent storage.
+    - **healthcheck**: Health check configuration.
+    - **restart**: Restart policy.
+
+  - **registry-ui**: Configuration for the Docker registry UI service.
+    - **image**: Docker image to use (e.g., `joxit/docker-registry-ui:2.5.0`).
+    - **container_name**: Name of the container (e.g., `docker-registry-ui`).
+    - **ports**: Ports to expose (e.g., `${LAN_IP}:5001:80`).
+    - **environment**: Environment variables for the service.
+    - **depends_on**: Specifies dependencies for the service.
+    - **restart**: Restart policy.
+
+## Conclusion
+
+This document provides an overview of the parameters used in the CI/CD pipeline for the CapsuleBay repository. For further details, refer to the respective configuration files.

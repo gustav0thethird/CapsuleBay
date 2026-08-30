@@ -1,6 +1,6 @@
 # Infrastructure Setup
 
-This document provides instructions for deploying the core infrastructure components of CapsuleBay, including Vault and Docker Registry.
+This document provides instructions for deploying the core infrastructure components of CapsuleBay, specifically Vault and the Docker Registry.
 
 ## Prerequisites
 
@@ -10,24 +10,11 @@ Ensure that the following dependencies are installed on your system:
 - Curl
 - OpenSSL
 
-## Directory Structure
-
-The infrastructure components will be set up in the following directory structure:
-
-```
-/opt/infra
-├── data
-│   ├── auth
-│   ├── registry
-│   └── vault
-└── vault.hcl
-```
-
 ## Setup Instructions
 
 1. **Clone the Repository**
 
-   Clone the CapsuleBay repository to your local machine.
+   Clone the CapsuleBay repository to your local machine:
 
    ```bash
    git clone <repository-url>
@@ -36,69 +23,90 @@ The infrastructure components will be set up in the following directory structur
 
 2. **Run the Setup Script**
 
-   Execute the `setup.sh` script to initialize the infrastructure components.
+   Execute the `setup.sh` script to initialize the infrastructure components. This script will create necessary directories and configuration files.
 
    ```bash
    chmod +x infra/setup.sh
    infra/setup.sh
    ```
 
-   This script will:
-   - Create necessary directories.
-   - Generate a Vault configuration file (`vault.hcl`).
-   - Create a `.env` file with environment variables.
-   - Generate a `.secrets` file to store Jenkins credentials securely.
+   The script will automatically detect your LAN IP and create the following directories:
 
-3. **Deploy Infrastructure with Docker Compose**
+   - `data/vault`
+   - `data/registry`
+   - `data/auth`
 
-   Navigate to the `infra` directory and run Docker Compose to start the services.
+3. **Docker Compose Configuration**
+
+   The `docker-compose.yml` file is configured to deploy the following services:
+
+   - **Vault**: A tool for securely accessing secrets.
+   - **Registry**: A Docker registry for storing and managing Docker images.
+   - **Registry UI**: A user interface for the Docker registry.
+   - **Htpasswd**: A service for generating a password file for registry authentication.
+
+   The relevant configuration for each service is as follows:
+
+   ### Vault
+
+   - **Image**: `hashicorp/vault:1.15.4`
+   - **Ports**: 
+     - `8200:8200` (API)
+     - `8201:8201` (UI)
+   - **Volumes**: 
+     - `./data/vault:/vault/file`
+     - `./vault.hcl:/vault/config/vault.hcl:ro`
+   - **Command**: 
+     ```bash
+     vault server -config=/vault/config/vault.hcl
+     ```
+
+   ### Registry
+
+   - **Image**: `registry:2.8.3`
+   - **Ports**: 
+     - `${LAN_IP}:5000:5000`
+   - **Volumes**: 
+     - `./data/registry:/var/lib/registry`
+     - `./data/auth:/auth:ro`
+     - `./data/registry/config.yml:/etc/docker/registry/config.yml:ro`
+   - **Healthcheck**: 
+     ```bash
+     CMD curl -f http://localhost:5000/v2/
+     ```
+
+   ### Registry UI
+
+   - **Image**: `joxit/docker-registry-ui:2.5.0`
+   - **Ports**: 
+     - `${LAN_IP}:5001:80`
+   - **Environment Variables**: 
+     - `REGISTRY_TITLE=${REGISTRY_TITLE}`
+     - `REGISTRY_URL=http://${LAN_IP}:5000`
+     - `DELETE_IMAGES=true`
+
+4. **Start the Services**
+
+   Use Docker Compose to start the services defined in the `docker-compose.yml` file:
 
    ```bash
-   cd infra
-   docker-compose up -d
+   docker-compose -f infra/docker-compose.yml up -d
    ```
 
-   This command will start the following services:
+5. **Access the Services**
 
-   - **Vault**
-     - Port: `8200`
-     - Configuration file: `vault.hcl`
-     - Data storage: `./data/vault`
+   - **Vault UI**: Access the Vault UI at `http://<LAN_IP>:8200`.
+   - **Docker Registry**: Access the Docker Registry at `http://<LAN_IP>:5000`.
+   - **Registry UI**: Access the Registry UI at `http://<LAN_IP>:5001`.
 
-   - **Docker Registry**
-     - Port: `5000`
-     - Authentication: htpasswd
-     - Data storage: `./data/registry`
-     - Configuration file: `./data/registry/config.yml`
+6. **Stopping the Services**
 
-   - **Registry UI**
-     - Port: `5001`
-     - Connects to the Docker Registry.
+   To stop the services, run:
 
-4. **Accessing the Services**
-
-   - Vault UI: [http://<LAN_IP>:8200](http://<LAN_IP>:8200)
-   - Docker Registry: [http://<LAN_IP>:5000](http://<LAN_IP>:5000)
-   - Registry UI: [http://<LAN_IP>:5001](http://<LAN_IP>:5001)
-
-## Health Checks
-
-The Docker Registry service includes a health check to ensure it is running correctly. You can verify the health status using:
-
-```bash
-docker inspect --format='{{json .State.Health}}' docker-registry
-```
-
-## Stopping the Services
-
-To stop the running services, execute:
-
-```bash
-docker-compose down
-```
-
-This command will stop and remove the containers defined in the `docker-compose.yml` file.
+   ```bash
+   docker-compose -f infra/docker-compose.yml down
+   ```
 
 ## Conclusion
 
-You have successfully set up the core infrastructure components for CapsuleBay. For further configurations or troubleshooting, refer to the respective service documentation.
+You have successfully set up the core infrastructure components for CapsuleBay. Ensure to manage your secrets and configurations securely.
